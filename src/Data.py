@@ -23,7 +23,7 @@ def getDict(dataPipe):
 
 def loadDF(path):
     # load data
-    train_data, val_data = torchtext.datasets.SQuAD1(path)
+    train_data, val_data = torchtext.datasets.SQuAD2(path)
     
     # convert dataPipe to dictionary 
     train_dict, val_dict = getDict(train_data), getDict(val_data)
