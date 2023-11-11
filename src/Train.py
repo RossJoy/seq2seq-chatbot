@@ -1,63 +1,54 @@
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 from sklearn.model_selection import KFold
 
+# Assuming 'model' is a GPT-2 model from Hugging Face
+# Define the optimizer
+optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)
+
+# Assuming 'train_loader' and 'test_loader' are your DataLoader instances for training and testing
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
-def train(source_data, target_data, model, epochs, batch_size, print_every, learning_rate):
-    
-    model.to(device)
-    total_training_loss = 0
-    total_valid_loss = 0
-    loss = 0
-    
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
-    criterion = nn.NLLLoss()
+def train(model, train_loader, test_loader, optimizer, epochs):
+    criterion = nn.CrossEntropyLoss()
 
-    # use cross validation
-    kf = KFold(n_splits=epochs, shuffle=True)
-
-    for e, (train_index, test_index) in enumerate(kf.split(source_data), 1):
+    for epoch in range(epochs):
+        total_loss = 0.0
+        # Training phase
         model.train()
-        for i in range(0, len(train_index)):
+        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}")
+        for batch in progress_bar:
+            inputs = batch['input_ids'].to(device)
+            labels = batch['input_ids'].to(device)
 
-            src = source_data[i]
-            trg = target_data[i]
+            optimizer.zero_grad()  # Reset gradients
+            outputs = model(inputs, labels=labels)
+            loss = outputs.loss
+            loss.backward()  # Backpropagation
+            optimizer.step()  # Update model parameters
 
-            output = model(src, trg, src.size(0), trg.size(0))
+            total_loss += loss.item()
+            progress_bar.set_postfix(loss=loss.item())
 
-            current_loss = 0
-            for (s, t) in zip(output["decoder_output"], trg): 
-                current_loss += criterion(s, t)
+        average_loss = total_loss / len(train_loader)
+        print(f"Average Loss after epoch {epoch+1}: {average_loss:.4f}")
 
-            loss += current_loss
-            total_training_loss += (current_loss.item() / trg.size(0)) # add the iteration loss
-
-            if i % batch_size == 0 or i == (len(train_index)-1):
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
-                loss = 0
-
-
-        # validation set 
+        # Validation phase
         model.eval()
-        for i in range(0, len(test_index)):
-            src = source_data[i]
-            trg = target_data[i]
+        total_loss = 0.0
+        with torch.no_grad():
+            for batch in test_loader:
+                inputs = batch['input_ids'].to(device)
+                outputs = model(inputs, labels=inputs)
+                loss = outputs.loss
+                total_loss += loss.item()
 
-            output = model(src, trg, src.size(0), trg.size(0))
+        average_loss = total_loss / len(test_loader)
+        perplexity = torch.exp(torch.tensor(average_loss)).to(device)
+        print(f'Perplexity after epoch {epoch+1}: {perplexity.item()}')
 
-            current_loss = 0
-            for (s, t) in zip(output["decoder_output"], trg): 
-                current_loss += criterion(s, t)
-
-            total_valid_loss += (current_loss.item() / trg.size(0)) # add the iteration loss
-
-
-        if e % print_every == 0:
-            training_loss_average = total_training_loss / (len(train_index)*print_every)
-            validation_loss_average = total_valid_loss / (len(test_index)*print_every)
-            print("{}/{} Epoch  -  Training Loss = {:.4f}  -  Validation Loss = {:.4f}".format(e, epochs, training_loss_average, validation_loss_average))
-            total_training_loss = 0
-            total_valid_loss = 0 
+# Usage
+train(model, train_loader, test_loader, optimizer, epochs)
