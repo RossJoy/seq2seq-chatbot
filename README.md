@@ -1,32 +1,31 @@
-# Seq2Seq-Chatbot
+# ChatBot Model Comparing
 
 
 ## Project Summary
 
-In this project, you will learn how to build an AI chatbot using LSTMs, Seq2Seq, and pre-trained word embeddings for increased accuracy. You will be provided with a dataset of conversational dialogue. You will use this dataset to build your chatbot using Pytorch, train it on the dataset, and tune your network hyperparameters.
+Our project focuses on exploring the integration of a Seq2Seq LSTM model with an attention layer, comparing its performance with the GPT-2 model. The SQuAD 2.0 dataset will be utilized for training and evaluation. We aim to assess the relative performance of these models and identify strategies to enhance the Seq2Seq model's capabilities within the existing framework. 
 
-At the end of the project, you will demonstrate your proficiency in deep learning by conversing with their chatbot at the command line.
+The project will culminate in a comprehensive analysis of model interactions and potential improvements to the Seq2Seq architecture.
 
-  
 
-## Project Steps Overview and Estimated Duration
+### Prepare data 
 
-Below you will find each of the components of the project, and estimated times to complete each portion. These are  _estimates_  and not exact timings to help you expect the amount of time necessary to put aside to work on your project.
+Build  vocabulary from a corpus of language data. link of  the original source of the dataset: https://rajpurkar.github.io/SQuAD-explorer/explore/v2.0/dev/
 
-  
+The detailed format is described in the notebook。
 
-### Prepare data (~2 hours)
+### Build Model 
 
-Build your vocabulary from a corpus of language data. The Vocabulary object is described in Lesson Six: Seq2Seq.
+Seq2Seq LSTM model with an attention layer: Build Attenion, Encoder, Decoder, and larger Sequence to Sequence pattern in PyTorch. 
 
-### Build Model (~4 hours)
+GPT-2 model: Transformer Architecture, Multi-Head Self-Attention Mechanism, Parameter Scale and Large-Scale pretraining
 
-Build your Encoder, Decoder, and larger Sequence to Sequence pattern in PyTorch. This pattern is described in Lesson Six: Seq2Seq.
+### Train Model 
 
-### Train Model (~3 hours)
+Our training procedure involves utilizing Negative Log Likelihood (NLL) loss for parameter evaluation. The dataset is split into training and validation sets.
 
-Write your training procedure and divide your dataset into train/test/validation splits. Then, train your network and plot your evaluation metrics. Save your model after it reaches a satisfactory level of accuracy.
+Both the Seq2Seq LSTM with attention and GPT-2 models are trained, and their evaluation metrics are plotted for a comparative analysis. The trained models are saved upon achieving satisfactory accuracy levels.
 
-### Evaluate & Interact w/ Model (~1 hour)
+### Evaluate & Interact w/ Model 
 
-Write a script to interact with your network at the command line.
+After comparison, due to defects in the attention mechanism itself and inherent deficiencies in data aggregation, the GPT-2 model performed better.
