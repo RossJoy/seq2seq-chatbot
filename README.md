@@ -18,7 +18,7 @@ The detailed format is described in the notebook。
 
 Seq2Seq LSTM model with an attention layer: Build Attenion, Encoder, Decoder, and larger Sequence to Sequence pattern in PyTorch. 
 
-GPT-2 model: Transformer Architecture, Multi-Head Self-Attention Mechanism, Parameter Scale and Large-Scale pretraining
+The fine-tuned GPT-2 language model: Transformer Architecture, Multi-Head Self-Attention Mechanism, Parameter Scale and Large-Scale pretraining
 
 ### Train Model 
 
